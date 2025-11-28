@@ -2,10 +2,10 @@ import { Product, Project, CATEGORIES } from './types';
 
 export const generateProductCatalog = (): Product[] => {
   const specificItems: Product[] = [
-    { id: 'p1', name: 'Pupitre Operator Pro X', category: 'Control Room', price: 'On Request', image: '🖥️' },
-    { id: 'p2', name: 'Mur d\'Image LED 4K', category: 'Display Systems', price: 'On Request', image: '📺' },
-    { id: 'p3', name: 'ErgoChair Ultimate', category: 'Ergonomics', price: '850€', image: '🪑' },
-    { id: 'p4', name: 'Server Rack 42U', category: 'Connectivity', price: '1200€', image: '🔋' },
+    { id: 'p1', name: 'Pupitre Operator Pro X', category: 'Control Room', price: 'On Request', images: ['https://via.placeholder.com/400x300?text=Pupitre+Pro+X'] },
+    { id: 'p2', name: 'Mur d\'Image LED 4K', category: 'Display Systems', price: 'On Request', images: ['https://via.placeholder.com/400x300?text=LED+Wall+4K'] },
+    { id: 'p3', name: 'ErgoChair Ultimate', category: 'Ergonomics', price: '850€', images: ['https://via.placeholder.com/400x300?text=ErgoChair'] },
+    { id: 'p4', name: 'Server Rack 42U', category: 'Connectivity', price: '1200€', images: ['https://via.placeholder.com/400x300?text=Server+Rack'] },
   ];
 
   const generated: Product[] = Array.from({ length: 96 }).map((_, i) => ({
@@ -13,7 +13,7 @@ export const generateProductCatalog = (): Product[] => {
     name: `${CATEGORIES[i % CATEGORIES.length]} Unit MK-${i + 1}`,
     category: CATEGORIES[i % CATEGORIES.length],
     price: 'On Request',
-    image: ['🔌', '📡', '💡', '⌨️', '🖱️', '📹'][i % 6]
+    images: [`https://via.placeholder.com/400x300?text=${CATEGORIES[i % CATEGORIES.length]}+${i + 1}`]
   }));
 
   return [...specificItems, ...generated];

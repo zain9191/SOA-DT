@@ -5,12 +5,16 @@ export interface Product {
   name: string;
   category: string;
   price: string;
-  image: string;
+  images: string[];
+  vtigerRef?: string;
+  description?: string;
+  specs?: string;
 }
 
 export interface LayoutConfig {
   show3D: boolean;
   theme: 'dark' | 'light';
+  modelUrl?: string; // optional GLTF/GLB URL for per-project 3D model
 }
 
 export interface Project {

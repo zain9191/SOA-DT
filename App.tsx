@@ -11,18 +11,18 @@ export default function App() {
   const [view, setView] = useState<ViewMode>('dashboard');
   const [projects, setProjects] = useState<Project[]>(INITIAL_PROJECTS);
   const [currentProject, setCurrentProject] = useState<Project | null>(null);
-  const [catalog] = useState<Product[]>(INITIAL_CATALOG);
+  const [catalog, setCatalog] = useState<Product[]>(INITIAL_CATALOG);
 
   // --- ACTIONS ---
 
-  const handleCreateProject = () => {
+  const handleCreateProject = (include3D: boolean = false) => {
     const newProject: Project = {
       id: Date.now(),
       client: "New Client Dossier",
       status: "Draft",
       lastModified: new Date().toLocaleDateString(),
       selectedProducts: [],
-      layoutConfig: { show3D: true, theme: 'dark' }
+      layoutConfig: { show3D: include3D, theme: 'dark' }
     };
     setProjects([newProject, ...projects]);
     setCurrentProject(newProject);
@@ -58,6 +58,10 @@ export default function App() {
     updateCurrentProject({ selectedProducts: newSelection });
   };
 
+  const updateCatalog = (updatedProducts: Product[]) => {
+    setCatalog(updatedProducts);
+  };
+
   // --- ROUTER ---
 
   return (
@@ -79,6 +83,7 @@ export default function App() {
           onBack={() => setView('dashboard')}
           onPreview={() => setView('preview')}
           onToggleProduct={toggleProductSelection}
+          onUpdateCatalog={updateCatalog}
         />
       )}
 

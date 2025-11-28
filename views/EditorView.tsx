@@ -1,9 +1,11 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { 
-  ArrowLeft, Save, Eye, Briefcase, Grid, Layout, Search, CheckCircle, Monitor 
+  ArrowLeft, Save, Eye, Briefcase, Grid, Layout, Search, CheckCircle, Monitor, Settings 
 } from 'lucide-react';
 import { Project, Product } from '../types';
 import { Scene3D } from '../components/Scene3D';
+import { ProductEditor } from '../components/ProductEditor';
+import { ImageCarousel } from '../components/ImageCarousel';
 
 interface EditorViewProps {
   project: Project;
@@ -13,13 +15,20 @@ interface EditorViewProps {
   onBack: () => void;
   onPreview: () => void;
   onToggleProduct: (productId: string) => void;
+  onUpdateCatalog: (products: Product[]) => void;
 }
 
 export const EditorView: React.FC<EditorViewProps> = ({ 
-  project, catalog, onUpdateProject, onSave, onBack, onPreview, onToggleProduct 
+  project, catalog, onUpdateProject, onSave, onBack, onPreview, onToggleProduct, onUpdateCatalog
 }) => {
   const [activeTab, setActiveTab] = useState<'details' | 'products' | 'layout'>('products');
   const [searchTerm, setSearchTerm] = useState('');
+  const [showProductEditor, setShowProductEditor] = useState(false);
+  const [modelUrlInput, setModelUrlInput] = useState<string>(project.layoutConfig?.modelUrl || '');
+
+  useEffect(() => {
+    setModelUrlInput(project.layoutConfig?.modelUrl || '');
+  }, [project.layoutConfig?.modelUrl]);
 
   const filteredCatalog = useMemo(() => {
     return catalog.filter(p => 
@@ -115,15 +124,23 @@ export const EditorView: React.FC<EditorViewProps> = ({
             <div className="p-8 max-w-[1600px] mx-auto h-full flex flex-col">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4 border-b border-gray-100 pb-6">
                 <h2 className="text-3xl font-black text-black uppercase tracking-tighter">Équipements</h2>
-                <div className="relative w-full sm:w-auto group">
-                  <Search className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 group-hover:text-[#FFDD00] transition-colors" />
-                  <input 
-                    type="text" 
-                    placeholder="RECHERCHER..." 
-                    className="pl-10 pr-4 py-3 border-2 border-gray-200 focus:border-black outline-none w-full sm:w-80 font-bold uppercase text-sm placeholder-gray-300 transition-colors"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
+                <div className="flex gap-4 items-center w-full sm:w-auto">
+                  <div className="relative w-full sm:w-auto group flex-1 sm:flex-none">
+                    <Search className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 group-hover:text-[#FFDD00] transition-colors" />
+                    <input 
+                      type="text" 
+                      placeholder="RECHERCHER..." 
+                      className="pl-10 pr-4 py-3 border-2 border-gray-200 focus:border-black outline-none w-full sm:w-80 font-bold uppercase text-sm placeholder-gray-300 transition-colors"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                  </div>
+                  <button
+                    onClick={() => setShowProductEditor(true)}
+                    className="flex items-center gap-2 bg-black hover:bg-[#FFDD00] text-white hover:text-black px-4 py-3 font-bold uppercase text-sm transition-all"
+                  >
+                    <Settings className="w-4 h-4" /> Gérer
+                  </button>
                 </div>
               </div>
 
@@ -133,24 +150,30 @@ export const EditorView: React.FC<EditorViewProps> = ({
                   return (
                     <div 
                       key={product.id} 
-                      className={`group relative bg-white border-2 p-6 transition-all cursor-pointer flex flex-col ${
+                      className={`group relative bg-white border-2 p-0 transition-all cursor-pointer flex flex-col overflow-hidden ${
                         isSelected ? 'border-[#FFDD00] shadow-xl translate-x-1 -translate-y-1' : 'border-gray-100 hover:border-black hover:shadow-lg'
                       }`}
                       onClick={() => onToggleProduct(product.id)}
                     >
-                      <div className="flex justify-between items-start mb-6">
-                         <div className="text-5xl grayscale group-hover:grayscale-0 transition-all duration-300">{product.image}</div>
-                         {isSelected && <div className="bg-[#FFDD00] text-black p-1"><CheckCircle className="w-6 h-6" /></div>}
+                      <div className="relative w-full h-48 bg-gray-200 flex justify-between items-start p-4 overflow-hidden">
+                         <ImageCarousel 
+                           images={product.images || []} 
+                           alt={product.name}
+                           className="absolute inset-0"
+                         />
+                         {isSelected && <div className="relative z-10 bg-[#FFDD00] text-black p-1"><CheckCircle className="w-6 h-6" /></div>}
                       </div>
-                      <h4 className="font-black text-black text-lg mb-1 leading-tight uppercase">{product.name}</h4>
-                      <p className="text-xs font-bold text-gray-400 mb-6 uppercase tracking-wider">{product.category}</p>
-                      <div className="flex justify-between items-center text-xs mt-auto pt-4 border-t border-gray-100">
-                        <span className="font-mono text-gray-500 font-bold">{product.price}</span>
-                        <button className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest transition-colors ${
-                          isSelected ? 'bg-black text-[#FFDD00]' : 'bg-gray-100 text-gray-400 group-hover:bg-[#FFDD00] group-hover:text-black'
-                        }`}>
-                          {isSelected ? 'Sélectionné' : 'Ajouter'}
-                        </button>
+                      <div className="p-6 flex flex-col flex-1">
+                        <h4 className="font-black text-black text-lg mb-1 leading-tight uppercase">{product.name}</h4>
+                        <p className="text-xs font-bold text-gray-400 mb-6 uppercase tracking-wider">{product.category}</p>
+                        <div className="flex justify-between items-center text-xs mt-auto pt-4 border-t border-gray-100">
+                          <span className="font-mono text-gray-500 font-bold">{product.price}</span>
+                          <button className={`px-4 py-2 text-[10px] font-black uppercase tracking-widest transition-colors ${
+                            isSelected ? 'bg-black text-[#FFDD00]' : 'bg-gray-100 text-gray-400 group-hover:bg-[#FFDD00] group-hover:text-black'
+                          }`}>
+                            {isSelected ? 'Sélectionné' : 'Ajouter'}
+                          </button>
+                        </div>
                       </div>
                     </div>
                   );
@@ -173,8 +196,27 @@ export const EditorView: React.FC<EditorViewProps> = ({
                     </span>
                  </div>
               </div>
-              <div className="flex-1 bg-neutral-900 overflow-hidden shadow-2xl relative border-4 border-black">
-                 <Scene3D />
+              <div className="mb-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-1 bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+                  <label className="text-xs font-bold uppercase tracking-widest text-gray-500">Modèle 3D (URL)</label>
+                  <p className="text-sm text-gray-400 mb-3">Collez ici l'URL d'un fichier GLTF/GLB accessible publiquement.</p>
+                  <input
+                    type="url"
+                    value={modelUrlInput}
+                    onChange={(e) => setModelUrlInput(e.target.value)}
+                    placeholder="https://.../model.glb"
+                    className="w-full border-2 border-gray-200 px-3 py-2 rounded-md mb-3"
+                  />
+                  <div className="flex gap-3 justify-end">
+                    <button className="px-3 py-2 text-sm" onClick={() => setModelUrlInput(project.layoutConfig?.modelUrl || '')}>Réinitialiser</button>
+                    <button className="px-4 py-2 bg-black text-[#FFDD00] font-bold text-sm" onClick={() => onUpdateProject({ layoutConfig: { ...(project.layoutConfig || { theme: 'dark', show3D: false }), modelUrl: modelUrlInput } })}>Charger</button>
+                  </div>
+                </div>
+
+                <div className="lg:col-span-2 bg-neutral-900 overflow-hidden shadow-2xl relative border-4 border-black">
+                  <Scene3D modelUrl={project.layoutConfig?.modelUrl} />
+                </div>
+              </div>
                  <div className="absolute bottom-6 left-6 bg-black/80 backdrop-blur-sm p-6 text-white text-xs border-l-4 border-[#FFDD00] shadow-lg pointer-events-none select-none min-w-[200px]">
                     <p className="font-black mb-4 text-[#FFDD00] uppercase tracking-widest text-sm">Navigation</p>
                     <ul className="space-y-3 opacity-90 font-light">
@@ -232,14 +274,30 @@ export const EditorView: React.FC<EditorViewProps> = ({
                          <Briefcase className="w-5 h-5 text-[#FFDD00]" /> Sections Incluses
                        </h3>
                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                         {['Résumé Exécutif', 'Qualifications Équipe', 'Spécifications Techniques', 'Agencement Visuel (3D)'].map((label, i) => (
-                           <label key={i} className="flex items-center gap-4 cursor-pointer p-4 border border-gray-100 hover:border-black hover:bg-gray-50 transition-colors group">
-                             <div className="w-6 h-6 border-2 border-black flex items-center justify-center group-hover:bg-black transition-colors">
-                                <div className="w-3 h-3 bg-[#FFDD00]"></div>
-                             </div>
-                             <span className="text-sm font-bold text-gray-700 uppercase">{label}</span>
-                           </label>
-                         ))}
+                         <label className="flex items-center gap-4 cursor-pointer p-4 border border-gray-100 hover:border-black hover:bg-gray-50 transition-colors">
+                           <input type="checkbox" checked={true} readOnly className="w-5 h-5" />
+                           <span className="text-sm font-bold text-gray-700 uppercase">Résumé Exécutif</span>
+                         </label>
+
+                         <label className="flex items-center gap-4 cursor-pointer p-4 border border-gray-100 hover:border-black hover:bg-gray-50 transition-colors">
+                           <input type="checkbox" checked={true} readOnly className="w-5 h-5" />
+                           <span className="text-sm font-bold text-gray-700 uppercase">Qualifications Équipe</span>
+                         </label>
+
+                         <label className="flex items-center gap-4 cursor-pointer p-4 border border-gray-100 hover:border-black hover:bg-gray-50 transition-colors">
+                           <input type="checkbox" checked={true} readOnly className="w-5 h-5" />
+                           <span className="text-sm font-bold text-gray-700 uppercase">Spécifications Techniques</span>
+                         </label>
+
+                         <label className="flex items-center gap-4 cursor-pointer p-4 border border-gray-100 hover:border-black hover:bg-gray-50 transition-colors">
+                           <input 
+                             type="checkbox" 
+                             checked={project.layoutConfig?.show3D ?? false}
+                             onChange={(e) => onUpdateProject({ layoutConfig: { ...(project.layoutConfig || { theme: 'dark', show3D: false }), show3D: e.target.checked } })}
+                             className="w-5 h-5"
+                           />
+                           <span className="text-sm font-bold text-gray-700 uppercase">Agencement Visuel (3D)</span>
+                         </label>
                        </div>
                      </div>
                   </div>
@@ -248,6 +306,18 @@ export const EditorView: React.FC<EditorViewProps> = ({
           )}
         </main>
       </div>
+
+      {/* Product Editor Modal */}
+      {showProductEditor && (
+        <ProductEditor
+          products={catalog}
+          onSave={(updatedProducts) => {
+            onUpdateCatalog(updatedProducts);
+            setShowProductEditor(false);
+          }}
+          onClose={() => setShowProductEditor(false)}
+        />
+      )}
     </div>
   );
 };

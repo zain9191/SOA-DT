@@ -5,21 +5,20 @@ import { Project } from '../types';
 
 interface DashboardViewProps {
   projects: Project[];
-  onCreateProject: () => void;
+  onCreateProject: (include3D?: boolean) => void;
   onEditProject: (project: Project) => void;
 }
 
 export const DashboardView: React.FC<DashboardViewProps> = ({ projects, onCreateProject, onEditProject }) => {
+  const [showCreatePanel, setShowCreatePanel] = React.useState(false);
+  const [include3D, setInclude3D] = React.useState(false);
+
   return (
     <div className="min-h-screen bg-white text-black font-sans">
       <nav className="bg-white border-b-4 border-black px-8 py-6 flex justify-between items-center sticky top-0 z-10">
         <div className="flex items-center gap-4">
           {/* SOA Logo */}
-          <div className="flex gap-1 select-none">
-            <div className="w-10 h-10 bg-[#FFDD00] flex items-center justify-center text-black font-black text-xl shadow-sm">S</div>
-            <div className="w-10 h-10 bg-black flex items-center justify-center text-white font-black text-xl shadow-sm">O</div>
-            <div className="w-10 h-10 bg-black flex items-center justify-center text-white font-black text-xl shadow-sm">A</div>
-          </div>
+          <img src="https://www.soa-agencement.com/wp-content/uploads/2022/12/logo-SOA-jaune-cases-horizontal-HD-188-75.png" alt="SOA Logo" className="flex gap-0.5 select-none scale-75 origin-left h-10" />
           <h1 className="text-2xl font-black tracking-tight uppercase hidden sm:block">Manager</h1>
         </div>
         <div className="flex items-center gap-4">
@@ -34,17 +33,33 @@ export const DashboardView: React.FC<DashboardViewProps> = ({ projects, onCreate
             <h2 className="text-4xl font-black text-black uppercase tracking-tight mb-2">Projets Récents</h2>
             <p className="text-gray-500 font-light text-lg">Gestion des dossiers techniques et aménagements.</p>
           </div>
-          <button 
-            onClick={onCreateProject}
-            className="flex items-center gap-3 bg-[#FFDD00] hover:bg-[#ffe633] text-black px-8 py-4 font-bold uppercase tracking-wider transition-all shadow-lg hover:shadow-xl active:translate-y-0.5"
-          >
-            <Plus className="w-6 h-6" /> Nouveau Dossier
-          </button>
+          <div className="relative">
+            <button 
+              onClick={() => setShowCreatePanel(true)}
+              className="flex items-center gap-3 bg-[#FFDD00] hover:bg-[#ffe633] text-black px-8 py-4 font-bold uppercase tracking-wider transition-all shadow-lg hover:shadow-xl active:translate-y-0.5"
+            >
+              <Plus className="w-6 h-6" /> Nouveau Dossier
+            </button>
+
+            {showCreatePanel && (
+              <div className="absolute right-0 mt-3 w-80 bg-white border border-gray-200 rounded-lg shadow-xl p-4 z-40">
+                <h4 className="text-sm font-bold mb-3">Créer un nouveau dossier</h4>
+                <label className="flex items-center gap-3 mb-4">
+                  <input type="checkbox" checked={include3D} onChange={(e) => setInclude3D(e.target.checked)} className="w-4 h-4" />
+                  <span className="text-sm">Inclure la visualisation 3D pour ce projet</span>
+                </label>
+                <div className="flex justify-end gap-3">
+                  <button onClick={() => setShowCreatePanel(false)} className="px-3 py-2 text-sm">Annuler</button>
+                  <button onClick={() => { onCreateProject(include3D); setShowCreatePanel(false); setInclude3D(false); }} className="px-4 py-2 bg-black text-[#FFDD00] font-bold">Créer</button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           <motion.div 
-            onClick={onCreateProject}
+            onClick={() => setShowCreatePanel(true)}
             whileHover={{ scale: 1.01 }}
             whileTap={{ scale: 0.99 }}
             className="border-4 border-dashed border-gray-200 p-6 flex flex-col items-center justify-center text-gray-400 cursor-pointer hover:border-[#FFDD00] hover:text-black hover:bg-[#FFDD00]/5 transition-all h-72 group"
