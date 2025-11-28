@@ -214,18 +214,17 @@ export const EditorView: React.FC<EditorViewProps> = ({
                 </div>
 
                 <div className="lg:col-span-2 bg-neutral-900 overflow-hidden shadow-2xl relative border-4 border-black">
-                  <Scene3D modelUrl={project.layoutConfig?.modelUrl} />
+                 <Scene3D modelUrl={project.layoutConfig?.modelUrl} />
                 </div>
               </div>
-                 <div className="absolute bottom-6 left-6 bg-black/80 backdrop-blur-sm p-6 text-white text-xs border-l-4 border-[#FFDD00] shadow-lg pointer-events-none select-none min-w-[200px]">
-                    <p className="font-black mb-4 text-[#FFDD00] uppercase tracking-widest text-sm">Navigation</p>
-                    <ul className="space-y-3 opacity-90 font-light">
-                      <li className="flex items-center gap-3"><span className="w-2 h-2 bg-[#FFDD00]"></span> Clic Gauche : Rotation</li>
-                      <li className="flex items-center gap-3"><span className="w-2 h-2 bg-[#FFDD00]"></span> Clic Droit : Pan</li>
-                      <li className="flex items-center gap-3"><span className="w-2 h-2 bg-[#FFDD00]"></span> Molette : Zoom</li>
+                <div className="absolute bottom-6 left-6 bg-black/80 backdrop-blur-sm p-6 text-white text-xs border-l-4 border-[#FFDD00] shadow-lg pointer-events-none select-none min-w-[200px]">
+                   <p className="font-black mb-4 text-[#FFDD00] uppercase tracking-widest text-sm">Navigation</p>
+                   <ul className="space-y-3 opacity-90 font-light">
+                     <li className="flex items-center gap-3"><span className="w-2 h-2 bg-[#FFDD00]"></span> Clic Gauche : Rotation</li>
+                     <li className="flex items-center gap-3"><span className="w-2 h-2 bg-[#FFDD00]"></span> Clic Droit : Pan</li>
+                     <li className="flex items-center gap-3"><span className="w-2 h-2 bg-[#FFDD00]"></span> Molette : Zoom</li>
                     </ul>
                  </div>
-              </div>
             </div>
           )}
 
